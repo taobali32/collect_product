@@ -1,6 +1,7 @@
 {
     "name": "gather/jtar",
     "description": "gather ticket product",
+    "license": "MIT",
     "authors": [
         {
             "name": "jtar",
@@ -26,6 +27,5 @@
         "symfony/cache": "^3.3 || ^4.3 || ^5.0",
         "phpmailer/phpmailer": "^6.1",
         "symfony/error-handler": "^5.1 || ^4.4"
-    },
-    "version": "0.0.1"
+    }
 }

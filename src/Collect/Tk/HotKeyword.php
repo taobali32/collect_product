@@ -46,6 +46,7 @@ class HotKeyword extends BaseClient
             if (!empty($arr)){
                 return $arr;
             }
+
         }
 
         $response = $this->httpGet($url);

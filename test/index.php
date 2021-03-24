@@ -15,8 +15,8 @@ use Gather\Factory;
 $config = [
     'tk'    =>  [
         'miao_you_quan' =>  [
-            'apkey'  =>  'be935b07-a84f-d9b0-c686-70c6e16b0e6d',
-            'tbname' => 'lwk290367159',
+            'apkey'  =>  '',
+            'tbname' => '',
         ]
     ],
 ];

@@ -1,36 +1,64 @@
 <?php
+ini_set("display_errors", "On");
+
+error_reporting(E_ALL);
+
+ini_set("display_errors", "On");
+
+error_reporting(E_ALL); //显示所有错误信息
+
 
 require '../vendor/autoload.php';
 
 use Gather\Factory;
-
 
 $config = [
     'tk'    =>  [
         'miao_you_quan' =>  [
             'apkey'  =>  'be935b07-a84f-d9b0-c686-70c6e16b0e6d',
             'tbname' => 'lwk290367159',
-            'pid'    => 'mm_1637290136_2239400333_111218850173',
         ]
     ],
 ];
 
-
 try {
-    $result = Factory::collect($config)->tk_product->productLinkId(627430191595,'2702510978');
+
+    $result = Factory::collect($config)->tk_order->syncOrder(1,'');
 
     var_dump($result);
-//    while (count($product) > 0){
-//        //  写入数据库...
-//        $product = Factory::collect($config)->tk_product->new_products(['start' => 0, 'end' => 23]);
-//
-//
-//    }
 
 }catch (Exception $exception){
     //  打印日志
     $exception->getMessage();
 }
+
+
+//$config = [
+//    'tk'    =>  [
+//        'miao_you_quan' =>  [
+//            'apkey'  =>  'be935b07-a84f-d9b0-c686-70c6e16b0e6d',
+//            'tbname' => 'lwk290367159',
+//            'pid'    => 'mm_1637290136_2239400333_111218850173',
+//        ]
+//    ],
+//];
+//
+//
+//try {
+//    $result = Factory::collect($config)->tk_product->productLinkId(627430191595,'2702510978');
+//
+//    var_dump($result);
+////    while (count($product) > 0){
+////        //  写入数据库...
+////        $product = Factory::collect($config)->tk_product->new_products(['start' => 0, 'end' => 23]);
+////
+////
+////    }
+//
+//}catch (Exception $exception){
+//    //  打印日志
+//    $exception->getMessage();
+//}
 
 
 //$config = [

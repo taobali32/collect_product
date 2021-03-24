@@ -34,5 +34,9 @@ class ServiceProvider implements ServiceProviderInterface
         $app['tk_auth'] = function ($app) {
             return new Auth($app);
         };
+
+        $app['tk_order'] = function ($app) {
+            return new Order($app);
+        };
     }
 }

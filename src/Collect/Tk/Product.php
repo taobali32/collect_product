@@ -296,6 +296,7 @@ class Product extends BaseClient
      */
     protected function returnData($response)
     {
+        return $response;
         $arr = [];
 
         foreach ($response as $k => $v){
@@ -393,7 +394,6 @@ class Product extends BaseClient
     public function get()
     {
         $config = $this->app['config']['tk'];
-
         $min_id = $this->getCache()->has($this->cacheMinIdName) ? $this->getCache()->get($this->cacheMinIdName): 1;
 
         $uri = "http://v2.api.haodanku.com/itemlist/apikey/{$config['hao_dan_ku']['api_key']}/nav/3/cid/0/back/{$config['product']['back']}/min_id/{$min_id}";
@@ -405,7 +405,7 @@ class Product extends BaseClient
         }
 
         $this->getCache()->set($this->cacheMinIdName,$response['min_id'],10);
-
+        
         return $this->returnData($response['data']);
     }
 }

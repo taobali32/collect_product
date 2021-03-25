@@ -394,6 +394,7 @@ class Product extends BaseClient
     public function get()
     {
         $config = $this->app['config']['tk'];
+        
         $min_id = $this->getCache()->has($this->cacheMinIdName) ? $this->getCache()->get($this->cacheMinIdName): 1;
 
         $uri = "http://v2.api.haodanku.com/itemlist/apikey/{$config['hao_dan_ku']['api_key']}/nav/3/cid/0/back/{$config['product']['back']}/min_id/{$min_id}";

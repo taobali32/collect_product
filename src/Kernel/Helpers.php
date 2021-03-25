@@ -23,4 +23,30 @@ if (!function_exists('vdd')){
     }
 }
 
+if (!function_exists('build_request_param'))
+{
+
+    function build_request_param($baseUrl, $params)
+    {
+        if(empty($params))
+            return $baseUrl;
+
+        $baseUrl .= "?";
+        $demo = 0;
+        foreach($params as $k=>$v)
+        {
+            if($demo==0)
+            {
+                $baseUrl .= "{$k}={$v}";
+            }
+            else
+            {
+                $baseUrl .= "&{$k}={$v}";
+            }
+            $demo++;
+        }
+        return trim($baseUrl, "&");
+    }
+}
+
 

@@ -26,9 +26,15 @@ class Order extends BaseClient
         //  缓存 position_index
 
     }
-
+    
     /**
-     * 订单同步，建议每2分钟执行一次
+     * 同步订单
+     * @param int $page
+     * @param string $position_index
+     * @return mixed
+     * @throws \Gather\Kernel\Exceptions\InvalidConfigException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws Exception
      */
     public function syncOrder($page = 1,$position_index = '')
     {
@@ -57,6 +63,7 @@ class Order extends BaseClient
             return $response['data'];
         }
 
-        throw new Exception($response['msg'],$response['code']);
+        throw new Exception($response['data']['msg'], $response['code']);
     }
+
 }

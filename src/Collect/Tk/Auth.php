@@ -90,7 +90,7 @@ class Auth extends BaseClient
      */
     public function app(string $mobile) : string
     {
-        $config = $this->app['config']['tk']['bao_chuan'];
+        $config = $this->app['config']['tk']['bai_chuan'];
         
         $params = [
             'response_type' => 'code',
@@ -157,7 +157,7 @@ EOF;
      */
     public function getSessionKeyByCode($code = '',$node = '')
     {
-        $config = $this->app['config']['tk']['bao_chuan'];
+        $config = $this->app['config']['tk']['bai_chuan'];
 
         include_once  __DIR__ . "/../../Extend/sdk/taobao/TopSdk.php";
         include_once  __DIR__ . "/../../Extend/sdk/taobao/top/request/TbkScPublisherInfoSaveRequest.php";

@@ -8,6 +8,7 @@ use Gather\Kernel\Exceptions\InvalidConfigException;
 use Gather\Kernel\Traits\InteractsWithCache;
 use GuzzleHttp\Exception\GuzzleException;
 use function Couchbase\defaultDecoder;
+use function Gather\Kernel\comb;
 
 /**
  * Class Product
@@ -388,6 +389,53 @@ class Product extends BaseClient
     }
 
     /**
+     * 专栏筛选
+     * @param array $param
+     * @param string $mark
+     * @param false $clear
+     * @throws GuzzleException
+     * @throws InvalidConfigException
+     * @throws \Gather\Kernel\Exceptions\InvalidArgumentException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws Exception
+     */
+    public function column($param = [],$mark = '', $clear = false )
+    {
+        $config = $this->app['config']['tk'];
+
+        $cache_name = __FUNCTION__ . $mark;
+
+        if ($clear) {
+            $this->getCache()->delete($cache_name);
+        }
+
+        $min_id = $this->getCache()->has($cache_name) ? $this->getCache()->get($cache_name): 1;
+
+        $default = [
+            'back'    =>  500,
+            'type'    =>  1,
+            'min_id'  =>  $min_id,
+            'sort'    =>  0,
+            'cid'     =>  0,
+        ];
+        
+        $param = array_merge($default,$param);
+
+        $str = comb($param);
+        $uri = "http://v2.api.haodanku.com/itemlist/apikey/{$config['hao_dan_ku']['api_key']}/{$str}";
+
+        $response = $this->httpGet($uri);
+
+        if ($response['code'] != 1 ){
+            throw new Exception($response['msg'],$response['code']);
+        }
+
+        $this->getCache()->set($cache_name,$response['min_id'],3600);
+
+        return ($this->app['config']['original_data'] == true) ? $this->returnData($response) : $this->returnData($response['data']);
+    }
+
+    /**
      * Get product lists.
      *
      * @throws GuzzleException
@@ -396,9 +444,11 @@ class Product extends BaseClient
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function get($param = [],$clear = false )
+    public function get($param = [],$mark = '', $clear = false )
     {
         $config = $this->app['config']['tk'];
+
+        $this->cacheMinIdName = $this->cacheMinIdName . $mark;
 
         if ($clear) {
             $this->getCache()->delete($this->cacheMinIdName);

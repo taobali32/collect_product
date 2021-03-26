@@ -15,6 +15,26 @@ if (!function_exists('json_to_array')){
     }
 }
 
+/**
+ * 组合参数 /
+ */
+if (!function_exists('comb')){
+    /**
+     * comb
+     * @param array $param
+     * @return string
+     */
+    function comb($param){
+        $str = '';
+        foreach ($param as $item => $value){
+            $str .= "{$item}/{$value}/";
+        }
+
+        return trim($str,'/');
+    }
+}
+
+
 if (!function_exists('vdd')){
     function vdd($param){
         echo '<pre>';

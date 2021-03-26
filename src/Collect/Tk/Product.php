@@ -383,21 +383,38 @@ class Product extends BaseClient
     /**
      * Get product lists.
      *
-     * @return array
-     *
      * @throws GuzzleException
      * @throws Exception
      * @throws \Gather\Kernel\Exceptions\InvalidArgumentException
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function get()
+    public function get($param = [],$clear = false )
     {
         $config = $this->app['config']['tk'];
-        
+
+        if ($clear) {
+            $this->getCache()->delete($this->cacheMinIdName);
+        }
+
         $min_id = $this->getCache()->has($this->cacheMinIdName) ? $this->getCache()->get($this->cacheMinIdName): 1;
 
-        $uri = "http://v2.api.haodanku.com/itemlist/apikey/{$config['hao_dan_ku']['api_key']}/nav/3/cid/0/back/{$config['product']['back']}/min_id/{$min_id}";
+        if (isset($param['min_id'])){
+            $min_id = $param['min_id'];
+        }
+
+        $default = [
+            'nav'     =>  3,
+            'back'    =>  500,
+//            'min_id'  =>  1,
+            'sort'    =>  1,
+            'cid'     => 0
+        ];
+
+        $param = array_merge($default,$param);
+
+
+        $uri = "http://v2.api.haodanku.com/itemlist/apikey/{$config['hao_dan_ku']['api_key']}/nav/{$param['nav']}/cid/{$param['cid']}/back/{$param['back']}/min_id/{$min_id}";
 
         $response = $this->httpGet($uri);
 
@@ -407,6 +424,6 @@ class Product extends BaseClient
 
         $this->getCache()->set($this->cacheMinIdName,$response['min_id'],10);
         
-        return $this->returnData($response['data']);
+        return ($this->app['config']['original_data'] == true) ? $this->returnData($response) : $this->returnData($response['data']);
     }
 }

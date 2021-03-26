@@ -86,6 +86,7 @@ class ServiceContainer extends Container
                 'IntervalName' => 'exceptions',
                 'IsEx'        =>  false
             ],
+            'original_data' =>  false,
             'tk'    =>  [
                 'hot_key_word_cache_time'   =>  0,
                 'hao_dan_ku'  =>  [

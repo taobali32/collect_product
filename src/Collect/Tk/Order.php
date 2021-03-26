@@ -44,8 +44,8 @@ class Order extends BaseClient
     /**
      * 同步订单
      * @see https://www.ecapi.cn/index/index/openapi/id/83.shtml?ptype=1
-     * @param int $page
-     * @param string $position_index
+     * @param array $param
+     * @param string $mark
      * @return mixed
      * @throws \Gather\Kernel\Exceptions\InvalidConfigException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -59,14 +59,14 @@ class Order extends BaseClient
             'start_time' => date('Y-m-d H:i:s', strtotime("-30 minute")),
             'end_time'   => date('Y-m-d H:i:s'),
 //            'position_index'    =>  1,
-//            'page_no'    => 1,
+            'page_no'    => 1,
             'page_size'  => 20,
             'tbname' => $config['tbname'],
             'apkey' => $config['apkey'],
             'order_scene'   =>  2, // 渠道订单
             'query_type' => 1,    // 1：创建时间查询，2:付款时间查询，3:结算时间查询
         ];
-        
+
         $default = array_merge($default,$param);
 
         $position_index_cache_name = $mark . '_' . 'position_index';
@@ -77,10 +77,14 @@ class Order extends BaseClient
             $this->getCache()->delete($page_no_cache_name);
         }
 
-        $position_index            = $this->getCache()->has($position_index_cache_name) ? $this->getCache()->get($position_index_cache_name): '';
+        $position_index  = $this->getCache()->has($position_index_cache_name) ? $this->getCache()->get($position_index_cache_name): '';
 
         if ($position_index) {
             $default['position_index'] = $position_index;
+        }
+
+        if (isset($param['position_index'])){
+            $default['position_index'] = $param['position_index'];
         }
 
         $default['page_no'] = $this->getCache()->has($position_index_cache_name) ? $this->getCache()->get($position_index_cache_name): 1;
@@ -89,10 +93,15 @@ class Order extends BaseClient
 
         $response =  $this->httpGet( $uri, $default );
 
-        if ($response['code'] == 200){
-            return $response['data'];
+        if (isset($response['data']['position_index'])){
+            $this->getCache()->set($position_index_cache_name,$response['data']['position_index'],10);
+            $this->getCache()->set($page_no_cache_name,$response['data']['page_no'],10);
         }
 
+        if ($response['code'] == 200){
+            return ($this->app['config']['original_data'] == true) ? $response : $response['data'];
+        }
+        
         throw new Exception($response['msg'], $response['code']);
     }
 

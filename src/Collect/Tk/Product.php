@@ -152,7 +152,7 @@ class Product extends BaseClient
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws Exception
      */
-    public function search($param = [])
+    public function search($param = [],$mark = '',$clear = false)
     {
         $config = $this->app['config']['tk'];
 
@@ -161,23 +161,27 @@ class Product extends BaseClient
             'back'      =>  100,
             'is_coupon' =>  1,
             'sort'      =>  0,
-            'is_out'    =>  true
+            'keyword'   => '衣服',
+            'tb_p'      =>  1,
+            'min_id'    =>  1
         ];
 
-        $mergeConfig = array_merge($defaultConfig,$config['product']);
+        $min_id_cache = __FUNCTION__ . 'min_id' . $mark;
+        $tb_p_cache   = __FUNCTION__ . 'tb_p'   . $mark;
 
-        if (isset($param['keyword'])){
-            $param['keyword'] = urlencode(urlencode($param['keyword']));
+        if ($clear){
+            $this->getCache()->delete($min_id_cache);
+            $this->getCache()->delete($tb_p_cache);
         }
 
-        if (!isset($param['min_id'])){
-            $param['min_id'] = 1;
-        }
+        $defaultConfig['tb_p'] = $this->getCache()->has($tb_p_cache) ? $this->getCache()->get($tb_p_cache): 1;
+        $defaultConfig['min_id'] = $this->getCache()->has($min_id_cache) ? $this->getCache()->get($min_id_cache): 1;
 
-        $p = array_merge($mergeConfig,$param);
+        $mergeConfig = array_merge($defaultConfig,$param);
+        $mergeConfig['keyword'] = urlencode(urlencode($mergeConfig['keyword']));
 
         $str = '';
-        foreach ($p as $k => $v){
+        foreach ($mergeConfig as $k => $v){
             $str .= '/' . $k . '/' . $v;
         }
         
@@ -189,34 +193,37 @@ class Product extends BaseClient
             throw new Exception($response['msg'],$response['code']);
         }
 
+        $this->getCache()->set($min_id_cache,$response['min_id'],3600);
+        $this->getCache()->set($tb_p_cache,$response['tb_p'],3600);
+
         $arr = [];
 
-        foreach ($response['data'] as $k => $v){
-            $arr[] = [
-                'product_id'            =>  $v['itemid'],
-                'sale'                  =>  $v['itemsale'],
-                'coupon_url'            =>  $v['couponurl'],
-                'coupon_money'          =>  $v['couponmoney'],
-                'coupon_explain'        =>  '',
-                'guide_article'         =>  '',
-                'item_title'            =>  $v['itemtitle'],
-                'item_desc'             =>   $v['itemdesc'],
-                'shop_type'             =>  ($v['shoptype'] == 'B') ? 'tm' : 'tb',
-                'cate'                  =>  0,
-                'start_time'            =>  $v['couponstarttime'],
-                'end_time'              =>  $v['couponendtime'],
-                'slide_image'           =>  isset($v['taobao_image']) ? explode(',',$v['taobao_image']) : [],
-                'cover'                 =>  $v['itempic'],
-                'item_end_price'        =>  $v['itemendprice'],
-                'item_price'            =>  $v['itemprice'],
-                'predict_money'         =>  empty($v['tkmoney']) ? ($v['itemendprice'] * $v['tkrates'] / 100) : $v['tkmoney'],
-                'rate'                  =>  $v['tkrates'],
-                'item_detail'           =>  [$v['itempic']],
-                'item_detail_type'      =>  1
-            ];
-        }
-        
-        return ['min_id' => $response['min_id'],'data' => $arr];
+//        foreach ($response['data'] as $k => $v){
+//            $arr[] = [
+//                'product_id'            =>  $v['itemid'],
+//                'sale'                  =>  $v['itemsale'],
+//                'coupon_url'            =>  $v['couponurl'],
+//                'coupon_money'          =>  $v['couponmoney'],
+//                'coupon_explain'        =>  '',
+//                'guide_article'         =>  '',
+//                'item_title'            =>  $v['itemtitle'],
+//                'item_desc'             =>   $v['itemdesc'],
+//                'shop_type'             =>  ($v['shoptype'] == 'B') ? 'tm' : 'tb',
+//                'cate'                  =>  0,
+//                'start_time'            =>  $v['couponstarttime'],
+//                'end_time'              =>  $v['couponendtime'],
+//                'slide_image'           =>  isset($v['taobao_image']) ? explode(',',$v['taobao_image']) : [],
+//                'cover'                 =>  $v['itempic'],
+//                'item_end_price'        =>  $v['itemendprice'],
+//                'item_price'            =>  $v['itemprice'],
+//                'predict_money'         =>  empty($v['tkmoney']) ? ($v['itemendprice'] * $v['tkrates'] / 100) : $v['tkmoney'],
+//                'rate'                  =>  $v['tkrates'],
+//                'item_detail'           =>  [$v['itempic']],
+//                'item_detail_type'      =>  1
+//            ];
+//        }
+        return $this->app['config']['original_data'] == true ? $response : $response['data'];
+//        return ['min_id' => $response['min_id'],'data' => $arr];
     }
 
     /**
@@ -423,7 +430,7 @@ class Product extends BaseClient
         }
 
         $this->getCache()->set($this->cacheMinIdName,$response['min_id'],10);
-        
+
         return ($this->app['config']['original_data'] == true) ? $this->returnData($response) : $this->returnData($response['data']);
     }
 }

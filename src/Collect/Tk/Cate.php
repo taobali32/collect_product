@@ -16,8 +16,12 @@ use Gather\Kernel\Exceptions\Exception;
 class Cate extends BaseClient
 {
     /**
-     * get tk cate
-     * @return void
+     * 获取淘客分类
+     * @see https://www.haodanku.com/Openapi/api_detail?id=18
+     * @return array
+     * @throws \Gather\Kernel\Exceptions\InvalidConfigException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws Exception
      */
     public function get()
     {
@@ -32,6 +36,10 @@ class Cate extends BaseClient
         }
 
         $arr = [];
+        
+        if ($this->app['config']['original_data']){
+            return $response['general_classify'];
+        }
 
         foreach ($response['general_classify'] as $item => $value){
             $arr[$value['cid']] = $value['main_name'];

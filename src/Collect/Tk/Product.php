@@ -24,7 +24,11 @@ class Product extends BaseClient
     protected $cacheUpdateMinIdName = 'cache_update_min_id_name_id';
 
     protected $cacheNowProductMinIdName = 'cache_now_product_min_id_name';
+	
+    public function guessProduct()
+    {
 
+    }
 
 
     /**

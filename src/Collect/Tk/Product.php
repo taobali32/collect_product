@@ -127,13 +127,12 @@ class Product extends BaseClient
     /**
      * 获取商品原始数据
      * @see https://www.haodanku.com/Openapi/api_detail?id=17
-     * @param string $itemid
      * @return array
      * @throws GuzzleException
      * @throws InvalidConfigException
      * @throws Exception
      */
-    public function detail($itemid = '')
+    public function detail($product_id  = '')
     {
         $config = $this->app['config']['tk'];
 

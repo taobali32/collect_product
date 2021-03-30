@@ -26,7 +26,17 @@ class Product extends BaseClient
     protected $cacheNowProductMinIdName = 'cache_now_product_min_id_name';
 
 
-    // 分享
+
+    /**
+     * 商品转链
+     * @see https://www.ecapi.cn/index/index/openapi/id/72.shtml?ptype=1
+     * @param $product_id
+     * @param $relationid
+     * @return mixed
+     * @throws GuzzleException
+     * @throws InvalidConfigException
+     * @throws Exception
+     */
     public function productLinkId($product_id,$relationid)
     {
         $uri = 'http://api.web.ecapi.cn/taoke/doItemHighCommissionPromotionLinkByAll';
@@ -115,12 +125,10 @@ class Product extends BaseClient
 
 
     /**
-     * Detail product.
-     *
+     * 获取商品原始数据
+     * @see https://www.haodanku.com/Openapi/api_detail?id=17
      * @param string $itemid
-     *
      * @return array
-     *
      * @throws GuzzleException
      * @throws InvalidConfigException
      * @throws Exception
@@ -137,9 +145,7 @@ class Product extends BaseClient
             throw new Exception($response['msg'],$response['code']);
         }
 
-        $arr = [$response['data']];
-
-        return $this->returnData($arr);
+        return $this->app['config']['original_data'] == true ? $response : $response['data'];
     }
 
     /**

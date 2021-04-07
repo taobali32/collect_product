@@ -150,10 +150,10 @@ class Product extends BaseClient
 
         $response = $this->httpGet($uri);
 
-        if ($response['code'] != 1 ){
+        if ($response['code'] != 200 ){
             throw new Exception($response['msg'],$response['code']);
         }
-
+        
         $this->getCache()->set($min_id_cache,$response['min_id'],3600);
 
         return $this->app['config']['original_data'] == true ? $response : $this->returnData( $response['data']);

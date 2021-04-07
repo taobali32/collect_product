@@ -106,19 +106,47 @@ class Product extends BaseClient
         return ['min_id' => $response['min_id'], 'data' => $this->returnData($response['data'])];
     }
 
+
     /**
      * 高佣
      *
+     * @param array $param
+     * @param string $mark
+     * @param bool  $clear
      * @see https://www.haodanku.com/Openapi/api_detail?id=6
      * @return array
-     * @throws InvalidConfigException
+     *
+     * @throws \Gather\Kernel\Exceptions\InvalidConfigException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws Exception
      */
-    public function getHighitems(): array
+    public function getHighitems($param = [],$mark = '',$clear = false): array
     {
         $config = $this->app['config']['tk'];
 
-        $uri = "http://v2.api.haodanku.com/get_highitems/apikey/{$config['hao_dan_ku']['api_key']}/back/100min_id/1";
+        $defaultConfig = [
+            'cat_id'       =>  0,
+            'back'         =>  100,
+            'min_id'       =>  1
+        ];
+
+        $min_id_cache = __FUNCTION__ . 'min_id' . $mark;
+
+        if ($clear){
+            $this->getCache()->delete($min_id_cache);
+        }
+
+        $defaultConfig['min_id'] = $this->getCache()->has($min_id_cache) ? $this->getCache()->get($min_id_cache): 1;
+
+        $mergeConfig = array_merge($defaultConfig,$param);
+
+        $str = '';
+
+        foreach ($mergeConfig as $k => $v){
+            $str .= '/' . $k . '/' . $v;
+        }
+
+        $uri = "http://v2.api.haodanku.com/get_highitems/apikey/{$config['hao_dan_ku']['api_key']}" . $str;
 
         $response = $this->httpGet($uri);
 
@@ -126,7 +154,9 @@ class Product extends BaseClient
             throw new Exception($response['msg'],$response['code']);
         }
 
-        return $this->returnData($response['item_info']);
+        $this->getCache()->set($min_id_cache,$response['min_id'],3600);
+
+        return $this->app['config']['original_data'] == true ? $response : $this->returnData( $response['data']);
     }
 
     /**
@@ -258,7 +288,6 @@ class Product extends BaseClient
 //            ];
 //        }
         return $this->app['config']['original_data'] == true ? $response : $response['data'];
-//        return ['min_id' => $response['min_id'],'data' => $arr];
     }
 
     /**

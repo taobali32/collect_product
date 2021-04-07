@@ -249,7 +249,7 @@ class Product extends BaseClient
     {
         $config = $this->app['config']['tk'];
 
-        $uri = "http://v2.api.haodanku.com/item_detail/apikey/{$config['hao_dan_ku']['api_key']}/itemid/{$itemid}";
+        $uri = "http://v2.api.haodanku.com/item_detail/apikey/{$config['hao_dan_ku']['api_key']}/itemid/{$product_id}";
 
         $response = $this->httpGet($uri);
 

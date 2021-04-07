@@ -106,6 +106,60 @@ class Product extends BaseClient
         return ['min_id' => $response['min_id'], 'data' => $this->returnData($response['data'])];
     }
 
+    /**
+     * 9.9专区/偏远地区包邮商品API
+     *
+     * @param array $param
+     * @param string $mark
+     * @param bool  $clear
+     * @see https://www.haodanku.com/Openapi/api_detail?id=11
+     * @return array
+     *
+     * @throws \Gather\Kernel\Exceptions\InvalidConfigException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws Exception
+     */
+    public function get9($param = [],$mark = '',$clear = false): array
+    {
+        $config = $this->app['config']['tk'];
+
+        $defaultConfig = [
+            'cat_id'       =>  0,
+            'min_id'       =>  1,
+            'order'        =>  1,
+            'back'         =>  100,
+//            'keyword'       =>  ''
+        ];
+
+        $min_id_cache = __FUNCTION__ . 'min_id' . $mark;
+
+        if ($clear){
+            $this->getCache()->delete($min_id_cache);
+        }
+
+        $defaultConfig['min_id'] = $this->getCache()->has($min_id_cache) ? $this->getCache()->get($min_id_cache): 1;
+
+        $mergeConfig = array_merge($defaultConfig,$param);
+
+        $str = '';
+
+        foreach ($mergeConfig as $k => $v){
+            $str .= '/' . $k . '/' . $v;
+        }
+
+        $uri = "http://v2.api.haodanku.com/get_free_shipping_data/apikey/{$config['hao_dan_ku']['api_key']}" . $str;
+
+        $response = $this->httpGet($uri);
+
+        if ($response['code'] != 1 ){
+            throw new Exception($response['msg'],$response['code']);
+        }
+
+        $this->getCache()->set($min_id_cache,$response['min_id'],3600);
+        
+        return $this->app['config']['original_data'] == true ? $response : $this->returnData( $response['data']);
+    }
+
 
     /**
      * 高佣

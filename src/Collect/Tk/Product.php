@@ -107,8 +107,32 @@ class Product extends BaseClient
     }
 
     /**
+     * 高佣
+     *
+     * @see https://www.haodanku.com/Openapi/api_detail?id=6
+     * @return array
+     * @throws InvalidConfigException
+     * @throws Exception
+     */
+    public function getHighitems(): array
+    {
+        $config = $this->app['config']['tk'];
+
+        $uri = "http://v2.api.haodanku.com/get_highitems/apikey/{$config['hao_dan_ku']['api_key']}/back/100min_id/1";
+
+        $response = $this->httpGet($uri);
+
+        if ($response['code'] != 1 ){
+            throw new Exception($response['msg'],$response['code']);
+        }
+
+        return $this->returnData($response['item_info']);
+    }
+
+    /**
      * 今日值得买/今日推荐
      *
+     * @see https://www.haodanku.com/Openapi/api_detail?id=24
      * @return array
      * @throws InvalidConfigException
      * @throws Exception

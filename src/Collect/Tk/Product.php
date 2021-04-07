@@ -124,11 +124,10 @@ class Product extends BaseClient
         $config = $this->app['config']['tk'];
 
         $defaultConfig = [
-            'cat_id'       =>  0,
             'min_id'       =>  1,
             'order'        =>  1,
             'back'         =>  100,
-//            'keyword'       =>  ''
+            'type'         =>  2
         ];
 
         $min_id_cache = __FUNCTION__ . 'min_id' . $mark;
@@ -147,10 +146,11 @@ class Product extends BaseClient
             $str .= '/' . $k . '/' . $v;
         }
 
-        $uri = "http://v2.api.haodanku.com/get_free_shipping_data/apikey/{$config['hao_dan_ku']['api_key']}" . $str;
+        $uri = "http://v2.api.haodanku.com/low_price_Pinkage_data/apikey/{$config['hao_dan_ku']['api_key']}" . $str;
 
         $response = $this->httpGet($uri);
 
+        var_dump($response['min_id']);
         if ($response['code'] != 1 ){
             throw new Exception($response['msg'],$response['code']);
         }

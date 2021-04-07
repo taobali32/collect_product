@@ -106,7 +106,7 @@ class Product extends BaseClient
     }
 
     /**
-     * 今日值得买
+     * 今日值得买/今日推荐
      *
      * @return array
      * @throws InvalidConfigException
@@ -313,7 +313,6 @@ class Product extends BaseClient
      */
     protected function returnData($response)
     {
-        return $response;
         $arr = [];
 
         foreach ($response as $k => $v){

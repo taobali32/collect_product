@@ -311,6 +311,7 @@ class Product extends BaseClient
 
         $response = $this->httpGet($uri);
 
+
         if ($response['code'] != 1 ){
             throw new Exception($response['msg'],$response['code']);
         }
@@ -540,6 +541,7 @@ class Product extends BaseClient
         ];
         
         $param = array_merge($default,$param);
+        
 
         $str = comb($param);
         $uri = "http://v2.api.haodanku.com/itemlist/apikey/{$config['hao_dan_ku']['api_key']}/{$str}";
@@ -552,7 +554,7 @@ class Product extends BaseClient
 
         $this->getCache()->set($cache_name,$response['min_id'],3600);
 
-        return ($this->app['config']['original_data'] == true) ? $this->returnData($response) : $this->returnData($response['data']);
+        return ($this->app['config']['original_data'] == true) ? $response : $this->returnData($response['data']);
     }
 
     /**

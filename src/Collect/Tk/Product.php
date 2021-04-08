@@ -280,7 +280,7 @@ class Product extends BaseClient
             'back'      =>  100,
             'is_coupon' =>  1,
             'sort'      =>  0,
-            'keyword'   => '衣服',
+//            'keyword'   => '衣服',
             'tb_p'      =>  1,
             'min_id'    =>  1
         ];
@@ -597,6 +597,6 @@ class Product extends BaseClient
 
         $this->getCache()->set($this->cacheMinIdName,$response['min_id'],10);
 
-        return ($this->app['config']['original_data'] == true) ? $this->returnData($response) : $this->returnData($response['data']);
+        return ($this->app['config']['original_data'] == true) ? $response : $this->returnData($response['data']);
     }
 }

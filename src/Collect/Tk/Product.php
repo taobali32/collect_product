@@ -542,9 +542,8 @@ class Product extends BaseClient
         
         $param = array_merge($default,$param);
         
-
         $str = comb($param);
-        $uri = "http://v2.api.haodanku.com/itemlist/apikey/{$config['hao_dan_ku']['api_key']}/{$str}";
+        $uri = "http://v2.api.haodanku.com/column/apikey/{$config['hao_dan_ku']['api_key']}/{$str}";
 
         $response = $this->httpGet($uri);
 

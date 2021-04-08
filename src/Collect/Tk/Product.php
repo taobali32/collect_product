@@ -297,7 +297,10 @@ class Product extends BaseClient
         $defaultConfig['min_id'] = $this->getCache()->has($min_id_cache) ? $this->getCache()->get($min_id_cache): 1;
 
         $mergeConfig = array_merge($defaultConfig,$param);
-        $mergeConfig['keyword'] = urlencode(urlencode($mergeConfig['keyword']));
+
+        if (isset($mergeConfig['keyword'])){
+            $mergeConfig['keyword'] = urlencode(urlencode($mergeConfig['keyword']));
+        }
 
         $str = '';
         foreach ($mergeConfig as $k => $v){

@@ -286,14 +286,14 @@ class Product extends BaseClient
         ];
 
         $min_id_cache = __FUNCTION__ . 'min_id' . $mark;
-        $tb_p_cache   = __FUNCTION__ . 'tb_p'   . $mark;
+//        $tb_p_cache   = __FUNCTION__ . 'tb_p'   . $mark;
 
         if ($clear){
             $this->getCache()->delete($min_id_cache);
-            $this->getCache()->delete($tb_p_cache);
+//            $this->getCache()->delete($tb_p_cache);
         }
 
-        $defaultConfig['tb_p'] = $this->getCache()->has($tb_p_cache) ? $this->getCache()->get($tb_p_cache): 1;
+//        $defaultConfig['tb_p'] = $this->getCache()->has($tb_p_cache) ? $this->getCache()->get($tb_p_cache): 1;
         $defaultConfig['min_id'] = $this->getCache()->has($min_id_cache) ? $this->getCache()->get($min_id_cache): 1;
 
         $mergeConfig = array_merge($defaultConfig,$param);
@@ -312,12 +312,12 @@ class Product extends BaseClient
         $response = $this->httpGet($uri);
 
 
-        if ($response['code'] != 1 ){
+        if ($response['code'] != 200 && $response['code'] != 1){
             throw new Exception($response['msg'],$response['code']);
         }
 
         $this->getCache()->set($min_id_cache,$response['min_id'],3600);
-        $this->getCache()->set($tb_p_cache,$response['tb_p'],3600);
+//        $this->getCache()->set($tb_p_cache,$response['tb_p'],3600);
 
         $arr = [];
 

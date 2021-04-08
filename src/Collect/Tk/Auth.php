@@ -121,10 +121,7 @@ class Auth extends BaseClient
         {
             $relation_id = $this->getSessionKeyByCode($code, $state);
 
-            if ($relation_id){
-                 $callback($relation_id);
-                 
-                $str = <<<EOF
+            $str = <<<EOF
                         <script>
                         window.alert = function(name){
         var iframe = document.createElement("IFRAME");
@@ -136,17 +133,16 @@ class Auth extends BaseClient
     };
     </script>
 EOF;
-                echo $str;
-                echo "<script src='https://g.alicdn.com/mtb/lib_BC/0.1.0/p/index/index.js'></script>";
+            echo $str;
+            echo "<script src='https://g.alicdn.com/mtb/lib_BC/0.1.0/p/index/index.js'></script>";
 
+            if ($relation_id){
+                 $callback($relation_id);
                 echo "<script>alert('授权成功');Baichuan.closeWebView();</script>";
-                die;
+            }else{
+                echo "<script>alert('授权失败，请重新授权');Baichuan.closeWebView();</script>";
             }
-
-            echo "<script>alert('授权失败，请重新授权');Baichuan.closeWebView();</script>";
-            die;
         }
-      
     }
     
     /**

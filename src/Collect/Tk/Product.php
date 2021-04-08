@@ -257,7 +257,7 @@ class Product extends BaseClient
             throw new Exception($response['msg'],$response['code']);
         }
 
-        return $this->app['config']['original_data'] == true ? $response : $this->returnData($response['data']);
+        return $this->app['config']['original_data'] == true ? $response : $response['data'];
     }
 
     /**

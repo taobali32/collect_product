@@ -320,31 +320,32 @@ class Product extends BaseClient
 
         $arr = [];
 
-//        foreach ($response['data'] as $k => $v){
-//            $arr[] = [
-//                'product_id'            =>  $v['itemid'],
-//                'sale'                  =>  $v['itemsale'],
-//                'coupon_url'            =>  $v['couponurl'],
-//                'coupon_money'          =>  $v['couponmoney'],
-//                'coupon_explain'        =>  '',
-//                'guide_article'         =>  '',
-//                'item_title'            =>  $v['itemtitle'],
-//                'item_desc'             =>   $v['itemdesc'],
-//                'shop_type'             =>  ($v['shoptype'] == 'B') ? 'tm' : 'tb',
-//                'cate'                  =>  0,
-//                'start_time'            =>  $v['couponstarttime'],
-//                'end_time'              =>  $v['couponendtime'],
-//                'slide_image'           =>  isset($v['taobao_image']) ? explode(',',$v['taobao_image']) : [],
-//                'cover'                 =>  $v['itempic'],
-//                'item_end_price'        =>  $v['itemendprice'],
-//                'item_price'            =>  $v['itemprice'],
-//                'predict_money'         =>  empty($v['tkmoney']) ? ($v['itemendprice'] * $v['tkrates'] / 100) : $v['tkmoney'],
-//                'rate'                  =>  $v['tkrates'],
-//                'item_detail'           =>  [$v['itempic']],
-//                'item_detail_type'      =>  1
-//            ];
-//        }
-        return $this->app['config']['original_data'] == true ? $response : $response['data'];
+        foreach ($response['data'] as $k => $v){
+            $arr[] = [
+                'product_id'            =>  $v['itemid'],
+                'sale'                  =>  $v['itemsale'],
+                'coupon_url'            =>  $v['couponurl'],
+                'coupon_money'          =>  $v['couponmoney'],
+                'coupon_explain'        =>  '',
+                'guide_article'         =>  '',
+                'item_title'            =>  $v['itemtitle'],
+                'item_desc'             =>   $v['itemdesc'],
+                'shop_type'             =>  ($v['shoptype'] == 'B') ? 'tm' : 'tb',
+                'cate'                  =>  0,
+                'start_time'            =>  $v['couponstarttime'],
+                'end_time'              =>  $v['couponendtime'],
+                'slide_image'           =>  isset($v['taobao_image']) ? explode(',',$v['taobao_image']) : [],
+                'cover'                 =>  $v['itempic'],
+                'item_end_price'        =>  $v['itemendprice'],
+                'item_price'            =>  $v['itemprice'],
+                'predict_money'         =>  empty($v['tkmoney']) ? ($v['itemendprice'] * $v['tkrates'] / 100) : $v['tkmoney'],
+                'rate'                  =>  $v['tkrates'],
+                'item_detail'           =>  [$v['itempic']],
+                'item_detail_type'      =>  1
+            ];
+        }
+
+        return $this->app['config']['original_data'] == true ? $response : $arr;
     }
 
     /**

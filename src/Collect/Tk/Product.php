@@ -33,6 +33,31 @@ class Product extends BaseClient
 
 
     /**
+     * 生成淘口令
+     * @param array $param
+     * @see https://www.ecapi.cn/index/index/openapi/id/3.shtml?ptype=1
+     */
+    public function createTaoPwd($param = [])
+    {
+        $config = $this->app['config']['tk']['miao_you_quan'];
+
+        $param['title'] = urlencode(urlencode($param['title']));
+
+        $url = "http://api.web.ecapi.cn/taoke/createTaoPwd";
+
+        $param['apkey'] = $config['apkey'];
+
+        $response =  $this->httpGet($url,$param);
+
+        if ($response['code'] == 200){
+            return $response['data'];
+        }
+
+        throw new Exception($response['msg'],$response['code']);
+    }
+
+
+    /**
      * 商品转链
      * @see https://www.ecapi.cn/index/index/openapi/id/72.shtml?ptype=1
      * @param $product_id

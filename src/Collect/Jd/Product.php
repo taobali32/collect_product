@@ -36,11 +36,12 @@ class Product extends BaseClient
      */
     public function supermarket($param = [],$mark = '',$clear = false): array
     {
-        $uri = 'http://japi.jingtuitui.com/api/get_goods_list?eliteId=jdMarket';
+        $uri = 'http://japi.jingtuitui.com/api/get_goods_list';
 
         $config = $this->app['config']['jd'];
 
         $defaultConfig = [
+            'eliteId'       =>  'jdMarket',
             'v'             =>  'v2',
             'return_type'   =>  'json',
             'appid'         =>  '',
@@ -89,11 +90,12 @@ class Product extends BaseClient
      */
     public function tuan($param = [],$mark = '',$clear = false): array
     {
-        $uri = 'http://japi.jingtuitui.com/api/get_goods_list?eliteId=collage';
+        $uri = 'http://japi.jingtuitui.com/api/get_goods_list';
 
         $config = $this->app['config']['jd'];
 
         $defaultConfig = [
+            'eliteId'       =>  'collage',
             'v'             =>  'v2',
             'return_type'   =>  'json',
             'appid'         =>  '',
@@ -141,11 +143,12 @@ class Product extends BaseClient
      */
     public function get9($param = [],$mark = '',$clear = false): array
     {
-        $uri = 'http://japi.jingtuitui.com/api/get_goods_list?eliteId=nineSift';
+        $uri = 'http://japi.jingtuitui.com/api/get_goods_list';
 
         $config = $this->app['config']['jd'];
 
         $defaultConfig = [
+            'eliteId'       =>  'nineSift',
             'v'             =>  'v2',
             'return_type'   =>  'json',
             'appid'         =>  '',
@@ -222,7 +225,7 @@ class Product extends BaseClient
                 ];
             }
         }
-        
+
         return $arr;
     }
 

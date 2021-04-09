@@ -16,8 +16,11 @@ use Gather\Kernel\Exceptions\Exception;
 class Cate extends BaseClient
 {
     /**
-     * get jd cate
-     * @return void
+     * 京东分类
+     * @see http://www.jingtuitui.com/api_item?id=25
+     * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws Exception
      */
     public function get()
     {
@@ -33,6 +36,10 @@ class Cate extends BaseClient
 
         $arr = [];
 
+        if ($this->app['config']['original_data']){
+            return $response;
+        }
+        
         foreach ($response['result']['data'] as $item => $value){
             $arr[$value['cid']] = $value['cname'];
         }

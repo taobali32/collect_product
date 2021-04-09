@@ -22,6 +22,60 @@ class Product extends BaseClient
 
 
     /**
+     * 京东超市
+     * @see  http://www.jingtuitui.com/api_item?id=32
+     *
+     * @param array $param
+     * @param string $mark
+     * @param bool  $clear
+     * @see http://www.jingtuitui.com/api_item?id=17
+     * @return array
+     *
+     * @throws \Gather\Kernel\Exceptions\InvalidConfigException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws Exception
+     */
+    public function supermarket($param = [],$mark = '',$clear = false): array
+    {
+        $uri = 'http://japi.jingtuitui.com/api/get_goods_list?eliteId=jdMarket';
+
+        $config = $this->app['config']['jd'];
+
+        $defaultConfig = [
+            'v'             =>  'v2',
+            'return_type'   =>  'json',
+            'appid'         =>  '',
+            'appkey'        =>  '',
+            'pageIndex'     =>  1,
+            'pageSize'      =>  100,
+        ];
+
+        $min_id_cache = __FUNCTION__ . 'pageIndex' . $mark;
+
+        if ($clear){
+            $this->getCache()->delete($min_id_cache);
+        }
+
+        $defaultConfig['pageIndex'] = $this->getCache()->has($min_id_cache) ? $this->getCache()->get($min_id_cache): 1;
+
+        $mergeConfig = array_merge($defaultConfig,$param);
+        $mergeConfig['appid'] = $config['jing_tui_tui']['appid'];
+        $mergeConfig['appkey'] = $config['jing_tui_tui']['appkey'];
+
+        $response = $this->httpGet($uri,$mergeConfig);
+
+        if ($response['return'] != 0 ){
+            throw new Exception($response['result'],$response['return']);
+        }
+
+        $this->getCache()->set( $min_id_cache, ++$mergeConfig['pageIndex'] , 3600 );
+
+        return $this->app['config']['original_data'] == true ? $response : $this->returnData( $response['result']['data']);
+    }
+
+
+
+    /**
      * 京东拼团
      * @see  http://www.jingtuitui.com/api_item?id=32
      *
@@ -55,7 +109,7 @@ class Product extends BaseClient
         if ($clear){
             $this->getCache()->delete($min_id_cache);
         }
-
+        
         $defaultConfig['pageIndex'] = $this->getCache()->has($min_id_cache) ? $this->getCache()->get($min_id_cache): 1;
 
         $mergeConfig = array_merge($defaultConfig,$param);

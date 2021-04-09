@@ -28,7 +28,6 @@ class Product extends BaseClient
      * @param array $param
      * @param string $mark
      * @param bool  $clear
-     * @see http://www.jingtuitui.com/api_item?id=17
      * @return array
      *
      * @throws \Gather\Kernel\Exceptions\InvalidConfigException
@@ -77,7 +76,6 @@ class Product extends BaseClient
 
     /**
      * 京东拼团
-     * @see  http://www.jingtuitui.com/api_item?id=32
      *
      * @param array $param
      * @param string $mark
@@ -129,7 +127,7 @@ class Product extends BaseClient
 
 
     /**
-     * 9.9专
+     * 9.9专场
      *
      * @param array $param
      * @param string $mark

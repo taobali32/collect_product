@@ -6,7 +6,9 @@ namespace Gather\Collect\Jd;
 
 use Gather\Kernel\BaseClient;
 use Gather\Kernel\Exceptions\Exception;
+use Gather\Kernel\Exceptions\InvalidConfigException;
 use Gather\Kernel\Traits\InteractsWithCache;
+use GuzzleHttp\Exception\GuzzleException;
 use function Gather\Kernel\json_to_array;
 
 /**
@@ -19,6 +21,40 @@ class Product extends BaseClient
 {
     use InteractsWithCache;
     protected $cache_name = 'cache_jd_min_id';
+
+
+    /**
+     * 获取商品详情
+     * @see https://www.haodanku.com/Openapi/api_detail?id=17
+     * @return array
+     * @throws GuzzleException
+     * @throws InvalidConfigException
+     * @throws Exception
+     */
+    public function detail($param = [])
+    {
+        $config = $this->app['config']['jd'];
+
+
+        $uri = "http://japi.jingtuitui.com/api/jd_goods_query";
+
+        $defaultConfig = [
+            'appid'         =>  $config['jing_tui_tui']['appid'],
+            'appkey'        =>   $config['jing_tui_tui']['appkey'],
+            'v'             =>  'v3',
+            'return_type'   =>  'json',
+        ];
+
+        $mergeConfig = array_merge($defaultConfig,$param);
+
+        $response = $this->httpGet($uri,$mergeConfig);
+
+        if ($response['return'] != 0 ){
+            throw new Exception($response['result'],$response['return']);
+        }
+
+        return $this->app['config']['original_data'] == true ? $response : $response['result']['goods'];
+    }
 
 
     /**
@@ -201,7 +237,7 @@ class Product extends BaseClient
 
             if ($v['J_state'] == 2){
                 $arr[] = [
-                    'product_id'            =>  $v['JID'],
+                    'product_id'            =>  $v['goods_id'],
                     'sale'                  =>  $v['inOrderCount30Days'],
                     'coupon_url'            =>  $v['discount_link'],
                     'coupon_money'          =>  $v['discount_price'],

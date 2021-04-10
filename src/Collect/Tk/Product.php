@@ -262,7 +262,7 @@ class Product extends BaseClient
 
 
     /**
-     * 获取商品原始数据
+     * 获取商品详情
      * @see https://www.haodanku.com/Openapi/api_detail?id=17
      * @return array
      * @throws GuzzleException

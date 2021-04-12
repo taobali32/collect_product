@@ -16,7 +16,10 @@ use Gather\Kernel\ServiceContainer;
  * @property \Gather\Collect\Jd\Cate                              $jd_cate
  * @property \Gather\Collect\Jd\HotKeyword                        $jd_hot_keyword
  * @property \Gather\Collect\Jd\Product                           $jd_product
+ * @property \Gather\Collect\Jd\Auth                              $jd_auth
 
+ * @property \Gather\Collect\Pdd\Cate                              $pdd_cate
+ *
  * @package Gather\Collect
  */
 class Application extends ServiceContainer
@@ -27,6 +30,7 @@ class Application extends ServiceContainer
     protected $providers = [
         \Gather\Collect\Tk\ServiceProvider::class,
         \Gather\Collect\Jd\ServiceProvider::class,
+        \Gather\Collect\Pdd\ServiceProvider::class,
     ];
 
     /**

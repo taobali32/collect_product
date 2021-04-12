@@ -24,6 +24,18 @@ class Product extends BaseClient
 
 
     /**
+     * 商品专链
+     * @see http://www.jingtuitui.com/api_item?id=14
+     * @param $product_id
+     * @param $jd_relation_id
+     * @return void
+     */
+    public function productLinkId($product_id,$jd_relation_id)
+    {
+
+    }
+
+    /**
      * 获取商品详情
      * @see https://www.haodanku.com/Openapi/api_detail?id=17
      * @return array
@@ -34,7 +46,6 @@ class Product extends BaseClient
     public function detail($param = [])
     {
         $config = $this->app['config']['jd'];
-
 
         $uri = "http://japi.jingtuitui.com/api/jd_goods_query";
 

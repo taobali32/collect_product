@@ -19,7 +19,7 @@ use Gather\Kernel\ServiceContainer;
  * @property \Gather\Collect\Jd\Auth                              $jd_auth
 
  * @property \Gather\Collect\Pdd\Cate                              $pdd_cate
- *
+ * @property \Gather\Collect\Pdd\Product                           $pdd_product
  * @package Gather\Collect
  */
 class Application extends ServiceContainer

@@ -23,5 +23,9 @@ class ServiceProvider implements ServiceProviderInterface
         $app['pdd_cate'] = function ($app) {
             return new Cate($app);
         };
+
+        $app['pdd_product'] = function ($app) {
+            return new Product($app);
+        };
     }
 }

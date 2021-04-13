@@ -106,13 +106,12 @@ class Auth extends BaseClient
         return $url;
     }
 
-
     /**
      * App唤醒备案回调
-     * @param string $code 阿里百川请求返回code 
+     * @param string $code 阿里百川请求返回code
      * @param string $state  自定义
      * @param \Closure $callback
-     * @return void
+     * @return string
      * @throws Exception
      */
     public function appCallBack($code,$state = '',\Closure $callback)
@@ -121,27 +120,27 @@ class Auth extends BaseClient
         {
             $relation_id = $this->getSessionKeyByCode($code, $state);
 
-            $str = <<<EOF
-                        <script>
-                        window.alert = function(name){
-        var iframe = document.createElement("IFRAME");
-        iframe.style.display="none";
-        iframe.setAttribute("src", 'data:text/plain,');
-        document.documentElement.appendChild(iframe);
-        window.frames[0].window.alert(name);
-        iframe.parentNode.removeChild(iframe);
-    };
-    </script>
-EOF;
-            echo $str;
+            ob_start();
+
             echo "<script src='https://g.alicdn.com/mtb/lib_BC/0.1.0/p/index/index.js'></script>";
 
             if ($relation_id){
-                 $callback($relation_id);
-                echo "<script>alert('授权成功');Baichuan.closeWebView();</script>";
+
+                try {
+                    $callback($relation_id);
+                    echo "<script>alert('授权成功');Baichuan.closeWebView();</script>";
+                }catch (\Exception $exception){
+                    echo "<script>alert('". $exception->getMessage() ."');Baichuan.closeWebView();</script>";
+                }
+
             }else{
                 echo "<script>alert('授权失败，请重新授权');Baichuan.closeWebView();</script>";
             }
+
+            $contents = ob_get_contents();
+            ob_end_clean();
+
+            return $contents;
         }
     }
     

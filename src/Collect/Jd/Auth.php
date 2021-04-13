@@ -44,6 +44,6 @@ class Auth extends BaseClient
             throw new \Exception($response['result'],$response['return']);
         }
 
-        return $response['result'];
+        return $this->app['config']['original_data'] == true ? $response : $response['result'];
     }
 }

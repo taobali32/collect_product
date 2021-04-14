@@ -62,6 +62,8 @@ class Order extends BaseClient
 
         $response =  $this->httpGet( $uri, $default );
 
+        $this->getCache()->set( $cache_pageNo, ++$page ,10);
+
         if ($response['return'] != 0) throw new Exception($response['result'], $response['return']);
 
         return ($this->app['config']['original_data'] == true) ? $response : $response['result']['data'];

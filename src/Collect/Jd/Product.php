@@ -23,16 +23,43 @@ class Product extends BaseClient
     protected $cache_name = 'cache_jd_min_id';
 
 
+
     /**
-     * 商品专链
+     * 商品转链
      * @see http://www.jingtuitui.com/api_item?id=14
      * @param $product_id
-     * @param $jd_relation_id
-     * @return void
+     * @param $relationid
+     * @return mixed
+     * @throws GuzzleException
+     * @throws InvalidConfigException
+     * @throws Exception
      */
-    public function productLinkId($product_id,$jd_relation_id)
+    public function productLinkId($product_id,$relationid,$param = [])
     {
+        $uri = 'http://japi.jingtuitui.com/api/get_goods_link';
 
+        $config = $this->app['config']['jd'];
+        
+        $defaulutParam = [
+            'appid'     =>  $config['jing_tui_tui']['appid'],
+            'appkey'    =>  $config['jing_tui_tui']['appkey'],
+            'return_type'   =>  'json',
+
+            'unionid'   =>  $config['lian_meng']['unionid'],
+            'gid'       =>  $product_id,
+            'positionid'    =>  $relationid,
+            'chainType' =>  2
+        ];
+
+        $margeParam = array_merge($defaulutParam,$param);
+
+        $response =  $this->httpGet($uri,$margeParam);
+
+        if ($response['return'] != 0){
+            throw new Exception($response['msg'],$response['return']);
+        }
+
+        return $this->app['config']['original_data'] == true ? $response : $response['result']['link'];
     }
 
     /**

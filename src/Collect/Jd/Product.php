@@ -362,6 +362,8 @@ class Product extends BaseClient
 
         $uri = "http://japi.jingtuitui.com/api/get_goods_list";
 
+        $config = array_merge($config,$param);
+
         $response = $this->httpGet($uri,$config);
 
         if ($response['return'] != 0 ){

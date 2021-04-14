@@ -593,7 +593,7 @@ class Product extends BaseClient
     {
         $config = $this->app['config']['tk'];
 
-        $this->cacheMinIdName = $this->cacheMinIdName . $mark;
+        $this->cacheMinIdName = 'TB_' . $this->cacheMinIdName . $mark;
 
         if ($clear) {
             $this->getCache()->delete($this->cacheMinIdName);
@@ -601,21 +601,16 @@ class Product extends BaseClient
 
         $min_id = $this->getCache()->has($this->cacheMinIdName) ? $this->getCache()->get($this->cacheMinIdName): 1;
 
-        if (isset($param['min_id'])){
-            $min_id = $param['min_id'];
-        }
-
         $default = [
             'nav'     =>  3,
             'back'    =>  500,
-//            'min_id'  =>  1,
+            'min_id'  =>  $min_id,
             'sort'    =>  1,
             'cid'     => 0
         ];
 
         $param = array_merge($default,$param);
-
-
+        
         $uri = "http://v2.api.haodanku.com/itemlist/apikey/{$config['hao_dan_ku']['api_key']}/nav/{$param['nav']}/cid/{$param['cid']}/back/{$param['back']}/min_id/{$min_id}";
 
         $response = $this->httpGet($uri);

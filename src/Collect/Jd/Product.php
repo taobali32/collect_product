@@ -20,8 +20,42 @@ use function Gather\Kernel\json_to_array;
 class Product extends BaseClient
 {
     use InteractsWithCache;
-    protected $cache_name = 'cache_jd_min_id';
 
+    /**
+     * 相似商品推荐
+     * @deprecated 
+     * @see http://www.jingtuitui.com/api_item?id=24
+     * @param array $param
+     * @return array|\Gather\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
+     * @throws GuzzleException
+     * @throws InvalidConfigException
+     * @throws Exception
+     */
+    public function relatedGoods($param = [])
+    {
+        $uri = "http://japi.jingtuitui.com/api/related_goods";
+
+        $config = $this->app['config']['jd'];
+
+        $defaulutParam = [
+            'appid'     =>  $config['jing_tui_tui']['appid'],
+            'appkey'    =>  $config['jing_tui_tui']['appkey'],
+            'v'         =>  'v2',
+            'return_type'   =>  'json',
+            'jd_type'    => 2
+        ];
+
+        $mergeConfig = array_merge($defaulutParam,$param);
+
+        $response =  $this->httpGet($uri,$mergeConfig);
+
+        if ($response['return'] != 0 ){
+            throw new Exception($response['result'],$response['return']);
+        }
+
+        dd($response['result']);
+        return $this->app['config']['original_data'] == true ? $response : $this->returnData( $response['result']);
+    }
 
 
     /**
@@ -39,7 +73,7 @@ class Product extends BaseClient
         $uri = 'http://japi.jingtuitui.com/api/get_goods_link';
 
         $config = $this->app['config']['jd'];
-        
+
         $defaulutParam = [
             'appid'     =>  $config['jing_tui_tui']['appid'],
             'appkey'    =>  $config['jing_tui_tui']['appkey'],
@@ -269,10 +303,6 @@ class Product extends BaseClient
 
             $slide_images = [];
 
-            foreach (json_to_array($v['imageList']) as $kk => $vv){
-                $slide_images[] = $vv['url'];
-            }
-
             if ($v['J_state'] == 2){
                 $arr[] = [
                     'product_id'            =>  $v['goods_id'],
@@ -287,8 +317,8 @@ class Product extends BaseClient
                     'cate'                  =>  $v['cid1'],
                     'start_time'            =>  $v['get_start_time'] / 1000,
                     'end_time'              =>  $v['get_end_time'] / 1000,
-//                'slide_image'           =>  isset($v['imageList']) ? explode(',',$v['imageList']) : [],
-                    'slide_image'           =>  $slide_images,
+
+                    'slide_image'           =>  [$v['goods_img']],
                     'cover'                 =>  $v['goods_img'],
                     'item_end_price'        =>  $v['final_price'],
                     'item_price'            =>  $v['goods_price'],
@@ -304,17 +334,23 @@ class Product extends BaseClient
     }
 
     /**
-     * gets
+     * 商品获取
+     * @see http://www.jingtuitui.com/api_item?id=1
      *
      * @return void
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws \Gather\Kernel\Exceptions\InvalidArgumentException
      */
-    public function get()
+    public function get($param = [],$mark = '', $clear = false )
     {
         $config = $this->app['config']['jd'];
+        
+        $cacheMinIdName = 'JD_' . __FUNCTION__  . $mark;
+        
+        
+        if ($clear) $this->getCache()->delete($cacheMinIdName);
 
-        $pageIndex = $this->getCache()->has($this->cache_name) ?? 1;
+        $pageIndex = $this->getCache()->has($cacheMinIdName) ?  $this->getCache()->get($cacheMinIdName) : 1;
 
         $config = [
             'v'         =>  'v2',
@@ -331,8 +367,11 @@ class Product extends BaseClient
         if ($response['return'] != 0 ){
             throw new Exception($response['result'],$response['return']);
         }
+        
+        $this->getCache()->set($cacheMinIdName,$response['result']['current_page'] + 1,10);
+        
+        return ($this->app['config']['original_data'] == true) ? $response : $this->returnData($response['result']['data']);
 
-        $this->getCache()->set($this->cache_name,10,$response['result']['current_page'] + 1);
 
         $arr = [];
 

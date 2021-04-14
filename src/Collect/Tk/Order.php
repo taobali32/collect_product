@@ -21,7 +21,16 @@ class Order extends BaseClient
     protected $cache_name = 'tk_order';
 
 
-
+    /**
+     * get
+     * @deprecated
+     * @return mixed
+     * @throws \Gather\Kernel\Exceptions\InvalidArgumentException
+     * @throws \Gather\Kernel\Exceptions\InvalidConfigException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws Exception
+     */
     public function get()
     {
         $config = $this->app['config']['tk'];

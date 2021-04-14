@@ -37,5 +37,10 @@ class ServiceProvider implements ServiceProviderInterface
         $app['jd_auth'] = function ($app) {
             return new Auth($app);
         };
+
+
+        $app['jd_order'] = function ($app) {
+            return new Order($app);
+        };
     }
 }

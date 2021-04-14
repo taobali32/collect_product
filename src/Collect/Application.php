@@ -14,6 +14,7 @@ use Gather\Kernel\ServiceContainer;
  * @property \Gather\Collect\Tk\Auth                              $tk_auth
  *
  * @property \Gather\Collect\Jd\Cate                              $jd_cate
+ * @property \Gather\Collect\Jd\Order                             $jd_order
  * @property \Gather\Collect\Jd\HotKeyword                        $jd_hot_keyword
  * @property \Gather\Collect\Jd\Product                           $jd_product
  * @property \Gather\Collect\Jd\Auth                              $jd_auth

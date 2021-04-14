@@ -15,17 +15,71 @@ class Product extends BaseClient
 
     protected $uri = "http://gw-api.pinduoduo.com/api/router";
 
+    //  商品搜索
+    public function search($param = [],$mark = '',$clear = false )
+    {
+        $config = $this->app['config']['pdd'];
+
+        $cache_name = 'pdd_' . __FUNCTION__ . $mark;
+        $cache_page = 'pdd_page_' . __FUNCTION__ . $mark;
+
+        if ($clear){
+            $this->getCache()->delete($cache_name);
+            $this->getCache()->delete($cache_page);
+        }
+
+        $list_id = $this->getCache()->has($cache_name) ? $this->getCache()->get($cache_name): '';
+        $page = $this->getCache()->has($cache_page) ? $this->getCache()->get($cache_page): 1;
+
+//        dd($list_id);   //  1618413871789_5d09ccdd2e36738809b5108850dc01ae
+        $defaultConfig = [];
+        if ($list_id){
+            $defaultConfig['list_id'] = $list_id;
+        }
+
+        $defaultConfig = [
+            'type'      =>  'pdd.ddk.goods.search',
+            'client_id' =>  $config['duo_duo_jin_bao']['client_id'],
+            'timestamp' =>  time(),
+            'data_type' =>  'JSON',
+            'version'   =>  'V1',
+            'with_coupon'   =>  true,
+            'page'      =>  $page,
+//            'list_id'   =>  '',
+//            'keyword'   =>  ''
+        ];
+
+        $margeConfig            =   array_merge($defaultConfig,$param);
+        $margeConfig['sign']    =   $this->pddSign($margeConfig,$config['kai_fang_ping_tai']['client_secret']);
+
+//        dd($margeConfig);
+        $response = $this->httpGet($this->uri,$margeConfig);
+
+        dd($response);
+        if (isset( $response['error_response'])){
+            throw new Exception($response['error_response']['error_msg'],$response['error_response']['error_code']);
+        }
+
+        if (isset( $response['goods_search_response']['list_id'] )){
+            $this->getCache()->set($cache_page, ++$page  ,600);
+
+            $this->getCache()->set($cache_name, $response['goods_search_response']['list_id']  ,600);
+        }
+
+        return $this->app['config']['original_data'] == true ? $response : $this->returnData( $response['goods_search_response']['goods_list'] );
+    }
+
     /**
      * 商品推荐
      * @see https://jinbao.pinduoduo.com/third-party/api-detail?apiName=pdd.ddk.goods.recommend.get
      * @param array $param
      * @return void
      */
-    public function tui($param = [],$mark = '',$clear = true)
+    public function tui($param = [],$mark = '',$clear = false)
     {
         $config = $this->app['config']['pdd'];
 
-        $cache_name = __FUNCTION__ . $mark;
+        $cache_name = 'pdd_' . __FUNCTION__ . $mark;
 
         $defaultConfig = [
             'type'              =>  'pdd.ddk.goods.recommend.get',
@@ -43,8 +97,6 @@ class Product extends BaseClient
         if(isset($margeConfig['activity_tags'])){
             $margeConfig['activity_tags'] = array_to_json( $margeConfig['activity_tags'] );
         }
-
-//        dd($margeConfig);
 
         $margeConfig['sign']    = $this->pddSign($margeConfig,$config['kai_fang_ping_tai']['client_secret']);
         
@@ -68,7 +120,8 @@ class Product extends BaseClient
             $this->getCache()->set($cache_name,$response['goods_basic_detail_response']['list_id'],600);
         }
 
-        return $this->returnData($response['goods_basic_detail_response']['list']);
+        return $this->app['config']['original_data'] == true ? $response : $this->returnData( $response['goods_basic_detail_response']['list'] );
+
     }
 
     /**
@@ -128,7 +181,6 @@ class Product extends BaseClient
         $client_secret = func_get_args()[1];
 
         $str = '';      //  拼接的字符串
-
 
 
 //        dd($param);

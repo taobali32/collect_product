@@ -142,7 +142,7 @@ class Product extends BaseClient
                     'coupon_explain'        =>  '',
                     'guide_article'         =>  $v['goods_desc'],
                     'item_title'            =>  $v['goods_name'],
-                    'item_desc'             =>  $v['goods_name'],
+                    'item_desc'             =>  $v['goods_desc'],
                     'shop_type'             =>  '',
                     'cate'                  =>  $v['opt_name'],
                     'start_time'            =>  $v['coupon_start_time'],

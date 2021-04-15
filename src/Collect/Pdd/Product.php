@@ -31,11 +31,6 @@ class Product extends BaseClient
         $list_id = $this->getCache()->has($cache_name) ? $this->getCache()->get($cache_name): '';
         $page = $this->getCache()->has($cache_page) ? $this->getCache()->get($cache_page): 1;
 
-        $defaultConfig = [];
-        if ($list_id){
-            $defaultConfig['list_id'] = $list_id;
-        }
-
         $defaultConfig = [
             'type'      =>  'pdd.ddk.goods.search',
             'client_id' =>  $config['duo_duo_jin_bao']['client_id'],
@@ -49,6 +44,10 @@ class Product extends BaseClient
 //            'keyword'   =>  ''
         ];
 
+        if ($list_id){
+            $defaultConfig['list_id'] = $list_id;
+        }
+
         $margeConfig            =   array_merge($defaultConfig,$param);
         $margeConfig['sign']    =   $this->pddSign($margeConfig,$config['kai_fang_ping_tai']['client_secret']);
 
@@ -60,7 +59,6 @@ class Product extends BaseClient
 
         if (isset( $response['goods_search_response']['list_id'] )){
             $this->getCache()->set($cache_page, ++$page  ,600);
-
             $this->getCache()->set($cache_name, $response['goods_search_response']['list_id']  ,600);
         }
 
@@ -172,23 +170,14 @@ class Product extends BaseClient
     {
         $param = func_get_args()[0];
 
-
-
         ksort($param);    //  排序
 
         $client_secret = func_get_args()[1];
 
         $str = '';      //  拼接的字符串
 
-
-//        dd($param);
         foreach ($param as $k => $v) {
-
-            if (is_array($v)){
-                dd(2);
-            }else{
                 $str .= $k . $v;
-            }
         }
 
         $sign = strtoupper(md5($client_secret. $str . $client_secret));    //  生成签名    MD5加密转大写

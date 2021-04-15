@@ -31,7 +31,6 @@ class Product extends BaseClient
         $list_id = $this->getCache()->has($cache_name) ? $this->getCache()->get($cache_name): '';
         $page = $this->getCache()->has($cache_page) ? $this->getCache()->get($cache_page): 1;
 
-//        dd($list_id);   //  1618413871789_5d09ccdd2e36738809b5108850dc01ae
         $defaultConfig = [];
         if ($list_id){
             $defaultConfig['list_id'] = $list_id;
@@ -45,6 +44,7 @@ class Product extends BaseClient
             'version'   =>  'V1',
             'with_coupon'   =>  true,
             'page'      =>  $page,
+            'custom_parameters' =>  '{"new":1}'
 //            'list_id'   =>  '',
 //            'keyword'   =>  ''
         ];
@@ -52,10 +52,8 @@ class Product extends BaseClient
         $margeConfig            =   array_merge($defaultConfig,$param);
         $margeConfig['sign']    =   $this->pddSign($margeConfig,$config['kai_fang_ping_tai']['client_secret']);
 
-//        dd($margeConfig);
         $response = $this->httpGet($this->uri,$margeConfig);
 
-        dd($response);
         if (isset( $response['error_response'])){
             throw new Exception($response['error_response']['error_msg'],$response['error_response']['error_code']);
         }

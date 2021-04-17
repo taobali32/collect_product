@@ -12,6 +12,42 @@ class Auth extends BaseClient
     protected $uri = "http://gw-api.pinduoduo.com/api/router";
 
     /**
+     * 查询是否绑定备案
+     * @see https://jinbao.pinduoduo.com/third-party/api-detail?apiName=pdd.ddk.member.authority.query
+     * @param array $param
+     * @return array|\Gather\Kernel\Support\Collection|mixed|object|\Psr\Http\Message\ResponseInterface|string
+     * @throws \Gather\Kernel\Exceptions\InvalidConfigException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws Exception
+     */
+    public function query($param = [])
+    {
+        $config = $this->app['config']['pdd'];
+
+        $defaultConfig = [
+            'type'      =>  'pdd.ddk.member.authority.query',
+            'client_id' =>  $config['duo_duo_jin_bao']['client_id'],
+            'timestamp' =>  time(),
+
+            'pid'  =>  '',
+        ];
+
+        $margeConfig            =   array_merge($defaultConfig,$param);
+
+        $margeConfig['sign']    =   $this->pddSign($margeConfig,$config['kai_fang_ping_tai']['client_secret']);
+
+        $response = $this->httpGet($this->uri,$margeConfig);
+
+        if (isset( $response['error_response'])){
+            throw new Exception($response['error_response']['error_msg'],$response['error_response']['error_code']);
+        }
+
+        if ($this->app['config']['original_data']) return $response;
+
+        return $response['authority_query_response']['bind'];
+    }
+
+    /**
      * 生成营销工具推广链接/备案
      * @see https://jinbao.pinduoduo.com/third-party/api-detail?apiName=pdd.ddk.rp.prom.url.generate
      * @param array $param
@@ -19,6 +55,7 @@ class Auth extends BaseClient
      * @throws \Gather\Kernel\Exceptions\InvalidConfigException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws Exception
+     * @return string
      */
     public function generate($param = [])
     {

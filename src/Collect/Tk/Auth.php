@@ -10,7 +10,6 @@ use function Gather\Kernel\build_request_param;
 
 class Auth extends BaseClient
 {
-
     /**
      * 获取邀请码
      */

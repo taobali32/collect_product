@@ -18,7 +18,7 @@ class Product extends BaseClient
     protected $uri = "http://gw-api.pinduoduo.com/api/router";
     
     /**
-     * 商品推广
+     * 商品推广/转链？
      * @see https://jinbao.pinduoduo.com/third-party/api-detail?apiName=pdd.ddk.goods.promotion.url.generate
      */
     public function generate($param = [])
@@ -30,11 +30,11 @@ class Product extends BaseClient
             'client_id' =>  $config['duo_duo_jin_bao']['client_id'],
             'timestamp' =>  time(),
 
-            'p_id'      =>  '',
             'data_type' =>  'JSON',
             'version'   =>  'V1',
-            'custom_parameters' =>  '{"new":2}',
+//            'custom_parameters' =>  '{"new":2}',
 
+            'p_id'      =>  '',
             'goods_sign_list'   =>  []  //  # 需要转为json
         ];
 
@@ -50,12 +50,8 @@ class Product extends BaseClient
             throw new Exception($response['error_response']['error_msg'],$response['error_response']['error_code']);
         }
 
-        if (isset( $response['goods_search_response']['list_id'] )){
-            $this->getCache()->set($cache_page, ++$page  ,600);
-            $this->getCache()->set($cache_name, $response['goods_search_response']['list_id']  ,600);
-        }
 
-        return $this->app['config']['original_data'] == true ? $response : $this->returnData( $response['goods_search_response']['goods_list'] );
+        return $this->app['config']['original_data'] == true ? $response :  $response['goods_promotion_url_generate_response']['goods_promotion_url_list'][0]['mobile_short_url'];
 
     }
 

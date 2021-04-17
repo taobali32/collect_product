@@ -116,7 +116,7 @@ class Auth extends BaseClient
         $margeConfig['sign']    =   $this->pddSign($margeConfig,$config['kai_fang_ping_tai']['client_secret']);
 
         $response = $this->httpGet($this->uri,$margeConfig);
-
+        
         if (isset( $response['error_response'])){
             throw new Exception($response['error_response']['error_msg'],$response['error_response']['error_code']);
         }

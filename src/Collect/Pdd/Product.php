@@ -6,7 +6,9 @@ namespace Gather\Collect\Pdd;
 
 use Gather\Kernel\BaseClient;
 use Gather\Kernel\Exceptions\Exception;
+use Gather\Kernel\Exceptions\InvalidConfigException;
 use Gather\Kernel\Traits\InteractsWithCache;
+use GuzzleHttp\Exception\GuzzleException;
 use function Gather\Kernel\array_to_json;
 
 class Product extends BaseClient
@@ -14,6 +16,82 @@ class Product extends BaseClient
     use InteractsWithCache;
 
     protected $uri = "http://gw-api.pinduoduo.com/api/router";
+
+
+    /**
+     * 商品详情
+     * @param $product_id
+     * @return void
+     */
+    public function detail($product_id = '')
+    {
+        $config = $this->app['config']['pdd'];
+
+        $defaultConfig = [
+            'type'      =>  'pdd.ddk.goods.detail',
+            'client_id' =>  $config['duo_duo_jin_bao']['client_id'],
+            'timestamp' =>  time(),
+
+            'custom_parameters' =>  '',
+            'goods_sign'    =>  $product_id,
+
+//            'custom_parameters' =>  '{"new":1}'
+        ];
+
+        $margeConfig            =   array_merge($defaultConfig,$param);
+        $margeConfig['sign']    =   $this->pddSign($margeConfig,$config['kai_fang_ping_tai']['client_secret']);
+
+        $response = $this->httpGet($this->uri,$margeConfig);
+
+        dd($response);
+        if (isset( $response['error_response'])){
+            throw new Exception($response['error_response']['error_msg'],$response['error_response']['error_code']);
+        }
+
+        if (isset( $response['goods_search_response']['list_id'] )){
+            $this->getCache()->set($cache_page, ++$page  ,600);
+            $this->getCache()->set($cache_name, $response['goods_search_response']['list_id']  ,600);
+        }
+
+        dd( $response['goods_search_response']['goods_list'] );
+
+        return $this->app['config']['original_data'] == true ? $response : $this->returnData( $response['goods_search_response']['goods_list'] );
+    }
+
+    /**
+     * 获取商品详情
+     * @deprecated
+     * @see https://www.ecapi.cn/index/index/openapi/id/183.shtml?ptype=3
+     * @return array
+     * @throws GuzzleException
+     * @throws InvalidConfigException
+     * @throws Exception
+     */
+    public function detail_del($product_id)
+    {
+        $config = $this->app['config']['pdd'];
+
+        $uri = "http://api.web.ecapi.cn/pinduoduo/getGoodsDetailInfo";
+
+        $defaultConfig = [
+            'apkey'             =>  $config['miao_you_quan']['apkey'],
+            'goods_sign'        =>  $this->pddSign(['goodsSign' => $product_id],$config['kai_fang_ping_tai']['client_secret'])
+        ];
+
+//        $mergeConfig = array_merge($defaultConfig,$param);
+        $mergeConfig = $defaultConfig;
+
+//        dd($mergeConfig);
+        $response = $this->httpGet($uri,$mergeConfig);
+
+        dd($response);
+
+        if ($response['return'] != 0 ){
+            throw new Exception($response['result'],$response['return']);
+        }
+
+        return $this->app['config']['original_data'] == true ? $response : $response['result']['goods'];
+    }
 
     //  商品搜索
     public function search($param = [],$mark = '',$clear = false )
@@ -29,7 +107,7 @@ class Product extends BaseClient
         }
 
         $list_id = $this->getCache()->has($cache_name) ? $this->getCache()->get($cache_name): '';
-        $page = $this->getCache()->has($cache_page) ? $this->getCache()->get($cache_page): 1;
+        $page    = $this->getCache()->has($cache_page) ? $this->getCache()->get($cache_page): 1;
 
         $defaultConfig = [
             'type'      =>  'pdd.ddk.goods.search',
@@ -133,7 +211,7 @@ class Product extends BaseClient
 
             if (isset($v['has_coupon']) && $v['has_coupon'] == true){
                 $arr[] = [
-                    'product_id'            =>  $v['goods_id'],
+                    'product_id'            =>  $v['goods_sign'],
                     'sale'                  =>  isset($v['sales_tip']) ? $v['sales_tip'] : 0,
                     'coupon_url'            =>  '',
                     'coupon_money'          =>  $v['coupon_discount'] / 100,
@@ -176,8 +254,12 @@ class Product extends BaseClient
 
         $str = '';      //  拼接的字符串
 
-        foreach ($param as $k => $v) {
+        if (is_array($param)){
+            foreach ($param as $k => $v) {
                 $str .= $k . $v;
+            }
+        }else{
+            $str .= $param;
         }
 
         $sign = strtoupper(md5($client_secret. $str . $client_secret));    //  生成签名    MD5加密转大写

@@ -129,4 +129,31 @@ class BaseClient
 
         return Middleware::log($this->app['logger'], $formatter, LogLevel::DEBUG);
     }
+    /**
+     * 签名
+     * @param $param
+     * @param $secret
+     * @return string
+     */
+    public function pddSign($param,$secret)
+    {
+        $param = func_get_args()[0];
+
+        ksort($param);    //  排序
+
+        $client_secret = func_get_args()[1];
+
+        $str = '';      //  拼接的字符串
+
+        if (is_array($param)){
+            foreach ($param as $k => $v) {
+                $str .= $k . $v;
+            }
+        }else{
+            $str .= $param;
+        }
+
+        $sign = strtoupper(md5($client_secret. $str . $client_secret));    //  生成签名    MD5加密转大写
+        return $sign;
+    }
 }

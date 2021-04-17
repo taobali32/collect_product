@@ -42,7 +42,7 @@ class Product extends BaseClient
         
         $margeConfig['goods_sign_list'] = array_to_json($margeConfig['goods_sign_list']);
         $margeConfig['sign']    =   $this->pddSign($margeConfig,$config['kai_fang_ping_tai']['client_secret']);
-
+        
 //        dd($margeConfig);
         $response = $this->httpGet($this->uri,$margeConfig);
 

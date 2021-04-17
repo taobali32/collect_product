@@ -165,7 +165,7 @@ class Product extends BaseClient
                     'cover'                 =>  $v['goods_image_url'],
                     'item_end_price'        =>   $v['min_group_price'] * 0.1,
                     'item_price'            =>  round($v['min_normal_price']*0.01, 2),
-                    'predict_money'         =>   ($v['promotion_rate']*0.1 * $v['min_group_price'] * 0.1 - $v['coupon_discount']*0.01) / 100,
+                    'predict_money'         =>   round(($v['promotion_rate']*0.1 * $v['min_group_price'] * 0.1 - $v['coupon_discount']*0.01) / 100,2),
                     'rate'                  =>  $v['promotion_rate']/ 1000,
                     'item_detail'           =>  [],
                     'item_detail_type'      =>  2

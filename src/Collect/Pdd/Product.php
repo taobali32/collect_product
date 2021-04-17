@@ -18,7 +18,20 @@ class Product extends BaseClient
     protected $uri = "http://gw-api.pinduoduo.com/api/router";
 
 
-    //  商品搜索
+    /**
+     * 商品搜索/商品详情(keyword)
+     * @see https://jinbao.pinduoduo.com/third-party/api-detail?apiName=pdd.ddk.goods.search
+     * @param array $param
+     * @param string $mark
+     * @param false $clear
+     * @return array|\Gather\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
+     * @throws Exception
+     * @throws GuzzleException
+     * @throws InvalidConfigException
+     * @throws \Gather\Kernel\Exceptions\InvalidArgumentException
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     */
     public function search($param = [],$mark = '',$clear = false )
     {
         $config = $this->app['config']['pdd'];

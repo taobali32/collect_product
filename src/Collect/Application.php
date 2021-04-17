@@ -22,6 +22,8 @@ use Gather\Kernel\ServiceContainer;
  * @property \Gather\Collect\Pdd\Cate                              $pdd_cate
  * @property \Gather\Collect\Pdd\Product                           $pdd_product
  * @property \Gather\Collect\Pdd\Auth                              $pdd_auth
+ * @property \Gather\Collect\Pdd\Order                             $pdd_order
+
  * @package Gather\Collect
  */
 class Application extends ServiceContainer

@@ -31,5 +31,9 @@ class ServiceProvider implements ServiceProviderInterface
         $app['pdd_auth'] = function ($app) {
             return new Auth($app);
         };
+
+        $app['pdd_order'] = function ($app) {
+            return new Order($app);
+        };
     }
 }

@@ -24,6 +24,7 @@ use Gather\Kernel\ServiceContainer;
  * @property \Gather\Collect\Pdd\Auth                              $pdd_auth
  * @property \Gather\Collect\Pdd\Order                             $pdd_order
 
+ * @property \Gather\Collect\Sn\Cate                              $sn_cate
  * @package Gather\Collect
  */
 class Application extends ServiceContainer
@@ -35,6 +36,7 @@ class Application extends ServiceContainer
         \Gather\Collect\Tk\ServiceProvider::class,
         \Gather\Collect\Jd\ServiceProvider::class,
         \Gather\Collect\Pdd\ServiceProvider::class,
+        \Gather\Collect\Sn\ServiceProvider::class,
     ];
 
     /**

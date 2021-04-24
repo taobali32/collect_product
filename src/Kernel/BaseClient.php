@@ -129,8 +129,39 @@ class BaseClient
 
         return Middleware::log($this->app['logger'], $formatter, LogLevel::DEBUG);
     }
+
+    
     /**
-     * 签名
+     * 生成签名
+     *
+     * @param array $data // 数据
+     * @return string
+     */
+    public  function snSign($data,$config)
+    {
+        $d = [
+            'appSecret' =>  '',
+            'appMethod' =>  '',
+            'appRequestTime'    =>  '',
+            'appKey'        =>  '',
+            'versionNo'  => ''
+        ];
+        $stringToBeSigned = '';
+        foreach ($data as $k => $v)
+        {
+            if("@" != substr($v, 0, 1))
+            {
+                $stringToBeSigned .= "$v";
+            }
+        }
+        unset($k, $v);
+
+        return strtolower(md5($stringToBeSigned));
+    }
+
+
+    /**
+     * 拼多多签名
      * @param $param
      * @param $secret
      * @return string

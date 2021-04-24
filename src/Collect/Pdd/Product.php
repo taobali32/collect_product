@@ -50,7 +50,6 @@ class Product extends BaseClient
             throw new Exception($response['error_response']['error_msg'],$response['error_response']['error_code']);
         }
 
-
         return $this->app['config']['original_data'] == true ? $response :  $response['goods_promotion_url_generate_response']['goods_promotion_url_list'][0]['mobile_short_url'];
 
     }

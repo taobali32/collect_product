@@ -23,10 +23,10 @@ class ServiceProvider implements ServiceProviderInterface
             return new Cate($app);
         };
 
-//        $app['pdd_product'] = function ($app) {
-//            return new Product($app);
-//        };
-//
+        $app['sn_product'] = function ($app) {
+            return new Product($app);
+        };
+
 //        $app['pdd_auth'] = function ($app) {
 //            return new Auth($app);
 //        };

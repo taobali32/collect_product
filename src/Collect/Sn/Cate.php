@@ -3,7 +3,7 @@
 namespace Gather\Collect\Sn;
 
 use Gather\Kernel\BaseClient;
-use GuzzleHttp\Client;
+use OpenSDK\Suning\Client;
 
 class Cate extends BaseClient
 {
@@ -15,20 +15,17 @@ class Cate extends BaseClient
      * @return array
      * @throws \Gather\Kernel\Exceptions\InvalidConfigException
      * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws Exception
      */
     public function get($param = [])
     {
         $config = $this->app['config']['sn'];
 
-        $c = new \OpenSDK\Suning\Client();
+        $c = new Client();
 
         $c->appKey = $config['AppKey'];
         $c->appSecret = $config['AppSecret'];
 
-
         $req = new \OpenSDK\Suning\Requests\Netalliance\CommoditycategoryQueryRequest();
-
         $z = new \OpenSDK\Suning\Params\Netalliance\CommoditycategoryItem();
         $z->setGrade(1);
         $z->setParentId(1);
@@ -46,7 +43,7 @@ class Cate extends BaseClient
         foreach ($response['sn_responseContent']['sn_body']['queryCommoditycategory']['resultList'][0]['catalogList'] as $item => $value) {
             $arr[$value['childCategoryCode']] = $value['childCategoryName'];
         }
-        
+
         return $arr;
     }
 }

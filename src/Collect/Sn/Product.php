@@ -3,13 +3,13 @@
 
 namespace Gather\Collect\Sn;
 
-
 use Gather\Kernel\BaseClient;
 use Gather\Kernel\Exceptions\Exception;
 use Gather\Kernel\Exceptions\InvalidConfigException;
 use Gather\Kernel\Traits\InteractsWithCache;
 use GuzzleHttp\Exception\GuzzleException;
 use OpenSDK\Suning\Client;
+use OpenSDK\Suning\Requests\Netalliance\CommoditydetailQueryRequest;
 use OpenSDK\Suning\Requests\Netalliance\SearchcommodityQueryRequest;
 use PhpParser\Node\Stmt\DeclareDeclare;
 use function Gather\Kernel\array_to_json;
@@ -18,49 +18,40 @@ class Product extends BaseClient
 {
     use InteractsWithCache;
 
-    protected $uri = "http://gw-api.pinduoduo.com/api/router";
-    
     /**
-     * 商品推广/转链？
-     * @see https://jinbao.pinduoduo.com/third-party/api-detail?apiName=pdd.ddk.goods.promotion.url.generate
+     * 关键字查询
+     * @param array $param
+     * @return array|mixed
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws \Gather\Kernel\Exceptions\InvalidArgumentException
      */
-    public function generate($param = [])
+    public function detail($param = [])
     {
-        $config = $this->app['config']['pdd'];
+        $config = $this->app['config']['sn'];
 
-        $defaultConfig = [
-            'type'      =>  'pdd.ddk.goods.promotion.url.generate',
-            'client_id' =>  $config['duo_duo_jin_bao']['client_id'],
-            'timestamp' =>  time(),
+        $c = new Client();
+        $c->appKey = $config['AppKey'];
+        $c->appSecret = $config['AppSecret'];
 
-            'data_type' =>  'JSON',
-            'version'   =>  'V1',
-//            'custom_parameters' =>  '{"new":2}',
+        $req = new CommoditydetailQueryRequest();
 
-            'p_id'      =>  '',
-            'goods_sign_list'   =>  []  //  # 需要转为json
-        ];
+        $req->setCommodityStr($param['product_id']);
 
-        $margeConfig            =   array_merge($defaultConfig,$param);
-        
-        $margeConfig['goods_sign_list'] = array_to_json($margeConfig['goods_sign_list']);
-        $margeConfig['sign']    =   $this->pddSign($margeConfig,$config['kai_fang_ping_tai']['client_secret']);
-        
-//        dd($margeConfig);
-        $response = $this->httpGet($this->uri,$margeConfig);
 
-        if (isset( $response['error_response'])){
-            throw new Exception($response['error_response']['error_msg'],$response['error_response']['error_code']);
-        }
+        $c->setRequest($req);
+        $response = $c->execute();
 
-        return $this->app['config']['original_data'] == true ? $response :  $response['goods_promotion_url_generate_response']['goods_promotion_url_list'][0]['mobile_short_url'];
 
+//        file_put_contents('./data1.php',"<?php return " . var_export($response['sn_responseContent']['sn_body']['querySearchcommodity'],true) . ";");
+
+//        dd($response['sn_responseContent']['sn_body']['queryCommoditydetail']);
+        return $this->app['config']['original_data'] == true ? $response : $this->returnData( $response['sn_responseContent']['sn_body']['queryCommoditydetail'] );
     }
 
 
     /**
-     * 商品搜索/商品详情(keyword)
-     * @see https://jinbao.pinduoduo.com/third-party/api-detail?apiName=pdd.ddk.goods.search
+     * 商品搜索
+     * @see
      * @param array $param
      * @param string $mark
      * @param false $clear
@@ -74,9 +65,6 @@ class Product extends BaseClient
      */
     public function search($param = [],$mark = '',$clear = false )
     {
-        ini_set("display_errors", "On");//打开错误提示
-        ini_set("error_reporting",E_ALL);//显示所有错误
-
         $config = $this->app['config']['sn'];
 
         $cache_page = 'sn_page_' . __FUNCTION__ . $mark;
@@ -107,11 +95,11 @@ class Product extends BaseClient
             $req->setSize(40);
         }
 
-
         $arr = $req->apiParams;
 
         $arr['coupon'] = (string)1;
         $arr['couponMark'] = (string)1;
+
         $req->apiParams = $arr;
 
         $c->setRequest($req);
@@ -122,9 +110,6 @@ class Product extends BaseClient
         }else{
             $this->getCache()->set($cache_page, 1  ,600);
         }
-
-
-        file_put_contents('./data1.php',"<?php return " . var_export($response['sn_responseContent']['sn_body']['querySearchcommodity'],true) . ";");
 
         return $this->app['config']['original_data'] == true ? $response : $this->returnData( $response['sn_responseContent']['sn_body']['querySearchcommodity'] );
     }
@@ -139,7 +124,7 @@ class Product extends BaseClient
     {
         $arr = [];
 
-        var_dump(count($response));
+
         foreach ($response as $k => $v){
 
             $imgs = [];
@@ -148,10 +133,8 @@ class Product extends BaseClient
                 $imgs[] = $Vv['picUrl'];
             }
 
-
-
             $arr[] = [
-                'product_id'            =>  $v['commodityInfo']['commodityCode'],
+                'product_id'            =>  $v['commodityInfo']['commodityCode'] . '-' . $v['commodityInfo']['supplierCode'],
                 'sale'                  =>  $v['commodityInfo']['monthSales'],
                 'coupon_url'            =>  $v['couponInfo']['couponUrl'],
                 'coupon_money'          =>  $v['couponInfo']['couponValue'],
@@ -174,9 +157,6 @@ class Product extends BaseClient
             ];
         }
 
-//        dd($arr);
         return $arr;
     }
-
-
 }

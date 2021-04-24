@@ -10,8 +10,9 @@ class Cate extends BaseClient
 
     /**
      * 获取苏宁分类
+     * @deprecated 
      * @see http://sums.suning.com/openPlatform/index.html#/home
-     * @see https://open.suning.com/ospos/apipage/toApiMethodDetailMenuNew.do?interCode=suning.netalliance.commoditycategory.query
+     * @see https://open.suning.com/ospos/apipage/toApiMethodDetailMenuNew.do?interCode=suning.netalliance.commoditycategory.query#
      * @return array
      * @throws \Gather\Kernel\Exceptions\InvalidConfigException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -27,8 +28,10 @@ class Cate extends BaseClient
 
         $req = new \OpenSDK\Suning\Requests\Netalliance\CommoditycategoryQueryRequest();
         $z = new \OpenSDK\Suning\Params\Netalliance\CommoditycategoryItem();
-        $z->setGrade(1);
+
         $z->setParentId(1);
+        $z->setGrade(1);
+
         $req->setCommodityCategoryList($z);
 
         $c->setRequest($req);

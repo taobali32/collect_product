@@ -10,6 +10,8 @@ use Gather\Kernel\Traits\InteractsWithCache;
 use GuzzleHttp\Exception\GuzzleException;
 use OpenSDK\Suning\Client;
 use OpenSDK\Suning\Requests\Netalliance\CommoditydetailQueryRequest;
+use OpenSDK\Suning\Requests\Netalliance\ExtensionlinkGetRequest;
+use OpenSDK\Suning\Requests\Netalliance\OrderQueryRequest;
 use OpenSDK\Suning\Requests\Netalliance\SearchcommodityQueryRequest;
 use PhpParser\Node\Stmt\DeclareDeclare;
 use function Gather\Kernel\array_to_json;
@@ -17,6 +19,80 @@ use function Gather\Kernel\array_to_json;
 class Product extends BaseClient
 {
     use InteractsWithCache;
+
+    
+    public function order($param = [],$mark = '',$clear = false)
+    {
+        $cache_page = 'sn_order_' . __FUNCTION__ . $mark;
+
+        if ($clear){
+            $this->getCache()->delete($cache_page);
+        }
+
+        $page_no    = $this->getCache()->has($cache_page) ? $this->getCache()->get($cache_page): 1;
+
+        $config = $this->app['config']['sn'];
+
+        $c = new Client();
+        $c->appKey = $config['AppKey'];
+        $c->appSecret = $config['AppSecret'];
+
+        $req = new OrderQueryRequest();
+
+        $defaultConfig = [
+            'page_no'   =>  $page_no,
+            'page_size' =>  50,
+            'start_time'    =>  date('Y-m-d H:i:s',time() - 600),
+            'end_time'      =>  date('Y-m-d H:i:s',time()),
+            'status'        =>  0
+        ];
+
+        $defaultConfig = array_merge($defaultConfig,$param);
+
+        $req->setPageNo($defaultConfig['page_no']);
+        $req->setPageSize($defaultConfig['page_size']);
+        $req->setStartTime($defaultConfig['start_time']);
+        $req->setEndTime($defaultConfig['end_time']);
+        $req->setOrderLineStatus($defaultConfig['status']);
+
+        $c->setRequest($req);
+        $response = $c->execute();
+
+//        file_put_contents('./dat1a.php',"<?php return " . var_export($response,true) . ";");
+
+
+        if ( $clear == false ){
+            $this->getCache()->set($cache_page, ++$page_no  ,600);
+        }else{
+            $this->getCache()->set($cache_page, 1  ,600);
+        }
+
+        return $this->app['config']['original_data'] == true ? $response : $response['sn_responseContent']['sn_body']['queryOrder'];
+
+    }
+
+
+    public function ticket2($urls,$user_id)
+    {
+        $url = 'http://api.web.ecapi.cn/suning/doCustomPromotionUrl';
+
+        $config = $this->app['config']['sn'];
+
+        $param = [
+            'apkey'     =>  $config['miao_you_quan']['apkey'],
+            'visitUrl'  =>  $urls,
+            'subUser'   =>  $user_id
+        ];
+
+        $response = $this->httpGet($url,$param);
+
+        if (isset($response['code']) && $response['code'] == 200){
+            return $this->app['config']['original_data'] == true ?
+                $response : $response['data']['shortUrl'];
+        }
+        
+    }
+
 
     /**
      * 关键字查询
@@ -41,11 +117,8 @@ class Product extends BaseClient
         $c->setRequest($req);
         $response = $c->execute();
 
+        return $this->app['config']['original_data'] == true ? $response : $this->returnData( $response['sn_responseContent']['sn_body']['queryCommoditydetail'] )[0];
 
-//        file_put_contents('./data1.php',"<?php return " . var_export($response['sn_responseContent']['sn_body']['querySearchcommodity'],true) . ";");
-
-//        dd($response['sn_responseContent']['sn_body']['queryCommoditydetail']);
-        return $this->app['config']['original_data'] == true ? $response : $this->returnData( $response['sn_responseContent']['sn_body']['queryCommoditydetail'] );
     }
 
 
@@ -89,6 +162,7 @@ class Product extends BaseClient
         if (isset($param['keyword']) && !empty($param['keyword']) ){
             $req->setKeyword($param['keyword']);
         }
+
         if (isset($param['size']) && !empty($param['size'])){
             $req->setSize($param['size']);
         }else{
@@ -124,7 +198,6 @@ class Product extends BaseClient
     {
         $arr = [];
 
-
         foreach ($response as $k => $v){
 
             $imgs = [];
@@ -134,6 +207,7 @@ class Product extends BaseClient
             }
 
             $arr[] = [
+                'product_url'           =>  $v['pgInfo']['pgUrl'],
                 'product_id'            =>  $v['commodityInfo']['commodityCode'] . '-' . $v['commodityInfo']['supplierCode'],
                 'sale'                  =>  $v['commodityInfo']['monthSales'],
                 'coupon_url'            =>  $v['couponInfo']['couponUrl'],

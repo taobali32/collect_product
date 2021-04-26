@@ -19,6 +19,26 @@ use function Gather\Kernel\array_to_json;
 class Product extends BaseClient
 {
     use InteractsWithCache;
+    
+
+    //
+    public function order2($param,$mark,$clear = false)
+    {
+        $url = 'http://api.web.ecapi.cn/suning/getOrderList';
+
+        $param = [
+            'apkey'     =>  'be935b07-a84f-d9b0-c686-70c6e16b0e6d',
+            'time_from' =>  date('Y-m-d H:i:s',time() - 7200),
+            'time_to'   =>  date('Y-m-d H:i:s',time()),
+            'page'      =>  1,
+            'pageSize'  =>  50
+        ];
+
+        $response = $this->httpGet($url,$param);
+
+
+        return $response;
+    }
 
     
     public function order($param = [],$mark = '',$clear = false)
@@ -58,8 +78,8 @@ class Product extends BaseClient
         $c->setRequest($req);
         $response = $c->execute();
 
+        dd($response);
 //        file_put_contents('./dat1a.php',"<?php return " . var_export($response,true) . ";");
-
 
         if ( $clear == false ){
             $this->getCache()->set($cache_page, ++$page_no  ,600);
@@ -68,7 +88,6 @@ class Product extends BaseClient
         }
 
         return $this->app['config']['original_data'] == true ? $response : $response['sn_responseContent']['sn_body']['queryOrder'];
-
     }
 
 

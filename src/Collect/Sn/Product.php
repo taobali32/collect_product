@@ -21,20 +21,24 @@ class Product extends BaseClient
     use InteractsWithCache;
     
 
-    //
-    public function order2($param,$mark,$clear = false)
+    public function order2($param = [],$mark,$clear = false)
     {
+        $config = $this->app['config']['sn'];
+
+
         $url = 'http://api.web.ecapi.cn/suning/getOrderList';
 
-        $param = [
-            'apkey'     =>  'be935b07-a84f-d9b0-c686-70c6e16b0e6d',
-            'time_from' =>  date('Y-m-d H:i:s',time() - 7200),
+        $defaultConfig = [
+            'apkey'     =>  $config['miao_you_quan']['apkey'],
+            'time_from' =>  date('Y-m-d H:i:s',time() - 36000),
             'time_to'   =>  date('Y-m-d H:i:s',time()),
             'page'      =>  1,
             'pageSize'  =>  50
         ];
 
-        $response = $this->httpGet($url,$param);
+        $defaultConfig = array_merge($defaultConfig,$param);
+
+        $response = $this->httpGet($url,$defaultConfig);
 
 
         return $response;
